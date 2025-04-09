@@ -23,8 +23,10 @@ const io = new Server(server, {
     }
 });
 
-
+// Have to run this function once to create database entry for boards.
 // boardEntry();
+
+
 const boards = async () => {
     const allBoards = await BingoBoard.find({});
     const result = allBoards.map(b => b.numbers[0])
