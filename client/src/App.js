@@ -160,7 +160,7 @@ function App() {
         style={{
           position:'fixed', left:10,top:10,
           padding: "10px 20px",
-          fontSize: "18px",
+          fontSize: "10px",
           backgroundColor: "#ed1313",
           color: "#fff",
           border: "none",
