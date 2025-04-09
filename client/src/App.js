@@ -16,6 +16,8 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [bingoClaimed, setBingoClaimed] = useState(false);
 
+  const [showRules, setShowRules] = useState(false);
+
   const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
@@ -78,10 +80,10 @@ function App() {
       setSelectedNumbers((prev) =>
         prev.includes(number) ? prev : [...prev, number]
       )
-    }else if (!selectedNumbers.includes(number)){
+    } else if (!selectedNumbers.includes(number)) {
       // setScore((prev) => prev-10);
       socket.emit('wrong-click');
-      
+
     }
   }
 
@@ -154,6 +156,22 @@ function App() {
   return (
     <div className="App">
       <h1>Bingo Game</h1>
+      <button
+        style={{
+          position:'fixed', left:10,top:10,
+          padding: "10px 20px",
+          fontSize: "18px",
+          backgroundColor: "#ed1313",
+          color: "#fff",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
+          boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+          transition: "transform 0.1s ease-in-out"
+        }}
+        onClick={() => setShowRules(true)}>
+        Show Rules
+      </button>
 
       {
         selectedBoard.length > 0 ? (
@@ -248,9 +266,9 @@ function App() {
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5,40px)", gap: "5px" }}>
 
                       {toColumnViseBoard(board).map((num, numIndex) => (
-                        <div key={numIndex} 
-                          style={{ 
-                            textAlign: "center", border: "1px solid #000", padding: "5px" ,border: "1px solid #000", borderRadius: "6px"
+                        <div key={numIndex}
+                          style={{
+                            textAlign: "center", border: "1px solid #000", padding: "5px", border: "1px solid #000", borderRadius: "6px"
                           }}>
                           {num}
                         </div>
@@ -263,6 +281,52 @@ function App() {
               }
             </div>
           </>
+        )
+      }
+
+      {
+        showRules && (
+          <div
+            style={{
+              position: 'fixed', top: 0, left: 0, width: "100%", height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex",
+              justifyContent: "center", alignItems: "center", zIndex: 1000
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "#fff", padding: "20px", borderRadius: "10px",
+                width: '300px', textAlign: 'left'
+              }}
+            >
+              <h3>Bingo Rules</h3>
+              <ul style={{ fontSize: '15px' }}>
+                <li>Select one of the given boards.</li>
+                <li>Wait for the number to be called.</li>
+                <li>Click the number on the board if it matches.</li>
+                <li>Faster clicks = more points (within 2s = 100, 4s = 70, else 20).</li>
+                <li>Wrong clicks deduct 10 points.</li>
+                <li>Click "Bingo" when you complete a row, column or diagonal. You will get 1000 points.</li>
+              </ul>
+
+              <button
+                style={{
+                  padding: "10px 20px",
+                  fontSize: "18px",
+                  backgroundColor: "#ed1313",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                  transition: "transform 0.1s ease-in-out"
+                }}
+                onClick={() => setShowRules(false)}>
+                Close
+              </button>
+            </div>
+
+          </div>
         )
       }
     </div>
