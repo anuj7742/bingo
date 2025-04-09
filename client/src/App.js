@@ -163,6 +163,10 @@ function App() {
                 <h3>Number Called: {calledNumber || 'Waiting..'}</h3>
               )
             }
+            {
+              gameOver &&
+              <h3>Game Over! </h3>
+            }
             
             <div style={{ display: "grid", justifyContent: "center", gridTemplateColumns: "repeat(5,40px)", gap: "5px" }}>
               {toColumnViseBoard(selectedBoard).map((num, index) => (
@@ -171,9 +175,7 @@ function App() {
                 </button>
               ))}
             </div>
-            {gameOver &&
-              <div>Game Over! </div>
-            }
+            
             <div >
               <button style={{margin:"20px"}} onClick={checkBingo}>Bingo</button>
               <button onClick= {() => window.location.reload() }>New Game</button>
