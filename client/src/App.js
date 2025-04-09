@@ -160,7 +160,7 @@ function App() {
               !gameStarted ? (
                 <h3>Game Starting in : {timer} seconds</h3>
               ) : (
-                <h3>Number Called: {calledNumber || 'Waiting..'}</h3>
+                !gameOver && <h3>Number Called: {calledNumber || 'Waiting..'}</h3>
               )
             }
             {
