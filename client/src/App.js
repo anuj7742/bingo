@@ -185,7 +185,7 @@ function App() {
         ) : (
           <>
             <h2>Select a Board</h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", }}>
+            <div style={{ display: "flex", justifyContent:"center", flexWrap: "wrap", gap: "20px", }}>
               {
                 boards.map((board, boardIndex) => (
                   <div key={boardIndex} style={{ border: "1px solid #ccc", padding: "10px", cursor:"pointer" }}
