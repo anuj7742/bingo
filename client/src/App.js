@@ -82,40 +82,40 @@ function App() {
   }
 
   const checkBingo = () => {
-    if(bingoClaimed){
+    if (bingoClaimed) {
       alert("You have already claimed bingo.");
       return;
     }
     const isBingo = () => {
       const board = toColumnViseBoard(selectedBoard);
       // For row
-      for(let i=0; i<5; i++){
-        const row = board.slice(i*5, i*5 +5);
-        if(row.every(num => selectedNumbers.includes(num))) return true;
+      for (let i = 0; i < 5; i++) {
+        const row = board.slice(i * 5, i * 5 + 5);
+        if (row.every(num => selectedNumbers.includes(num))) return true;
       }
 
       // For col
-      for(let i=0; i<5; i++){
-        const col = [0,1,2,3,4].map(j=> board[i + j * 5]);
-        if(col.every(num => selectedNumbers.includes(num))) return true;
+      for (let i = 0; i < 5; i++) {
+        const col = [0, 1, 2, 3, 4].map(j => board[i + j * 5]);
+        if (col.every(num => selectedNumbers.includes(num))) return true;
       }
 
-      const dia1 = [0,6,12,18,24];
-      const dia2 = [4,8,12,16,20];
+      const dia1 = [0, 6, 12, 18, 24];
+      const dia2 = [4, 8, 12, 16, 20];
 
-      if(dia1.every(num => selectedNumbers.includes(board[num]))) return true;
-      if(dia2.every(num=> selectedNumbers.includes(board[num]))) return true;
+      if (dia1.every(num => selectedNumbers.includes(board[num]))) return true;
+      if (dia2.every(num => selectedNumbers.includes(board[num]))) return true;
 
       return false;
     }
 
-    if(isBingo()){
+    if (isBingo()) {
       alert("🎉 BINGO! You Won!");
       setBingoClaimed(true);
       socket.off('number-called')
       setGameOver(true)
-      socket.emit('click-number',  { number: 0, createdAt: null, Bingo:true });
-    }else{
+      socket.emit('click-number', { number: 0, createdAt: null, Bingo: true });
+    } else {
       alert("Not yet, Keep trying");
     }
   }
@@ -138,10 +138,10 @@ function App() {
   // },[selectedNumbers])
 
   const toColumnViseBoard = (board) => {
-    const columns = [[],[],[],[],[]];
+    const columns = [[], [], [], [], []];
 
     board.forEach((num, i) => {
-      columns[i%5].push(num);
+      columns[i % 5].push(num);
     });
 
     return columns.flat();
@@ -154,7 +154,7 @@ function App() {
       {
         selectedBoard.length > 0 ? (
           <>
-            
+
             <h2>Score: {score}</h2>
             {
               !gameStarted ? (
@@ -167,34 +167,87 @@ function App() {
               gameOver &&
               <h3>Game Over! </h3>
             }
-            
-            <div style={{ display: "grid", justifyContent: "center", gridTemplateColumns: "repeat(5,40px)", gap: "5px" }}>
+
+            <div style={{ display: "grid", justifyContent: "center", gridTemplateColumns: "repeat(5,60px)", gap: "5px", marginTop: "20px" }}>
               {toColumnViseBoard(selectedBoard).map((num, index) => (
-                <button key={index} onClick={() => handleNumberClick(num)} style={selectedNumbers.includes(num) ? { backgroundColor: "#FFA500" } : {}}>
+                <button
+                  key={index}
+                  onClick={() => handleNumberClick(num)}
+                  style={{
+                    height: "60px",
+                    width: "60px",
+                    fontSize: "20px",
+                    backgroundColor: selectedNumbers.includes(num) ? "#FFA500" : "#fff",
+                    border: "1px solid #000",
+                    borderRadius: "6px",
+                    cursor: "pointer"
+                  }}>
                   {num}
                 </button>
               ))}
             </div>
-            
-            <div >
-              <button style={{margin:"20px"}} onClick={checkBingo}>Bingo</button>
-              <button onClick= {() => window.location.reload() }>New Game</button>
+
+            <div style={{ marginTop: "20px", display: "flex", gap: "20px", justifyContent: "center" }} >
+              <button
+                style={{
+                  padding: "10px 20px",
+                  fontSize: "18px",
+                  backgroundColor: "#ed1313",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                  transition: "transform 0.1s ease-in-out"
+                }}
+                onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onClick={checkBingo}>
+                Bingo
+              </button>
+              <button
+                style={{
+                  padding: "10px 20px",
+                  fontSize: "18px",
+                  backgroundColor: "#ed1313",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                  transition: "transform 0.1s ease-in-out"
+                }}
+                onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onClick={() => window.location.reload()}
+
+              >
+                New Game
+              </button>
             </div>
-            
+
           </>
         ) : (
           <>
             <h2>Select a Board</h2>
-            <div style={{ display: "flex", justifyContent:"center", flexWrap: "wrap", gap: "20px", }}>
+            <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "20px", }}>
               {
                 boards.map((board, boardIndex) => (
-                  <div key={boardIndex} style={{ border: "1px solid #ccc", padding: "10px", cursor:"pointer" }}
+                  <div key={boardIndex}
+                    style={{
+                      border: "1px solid #ccc", padding: "10px", cursor: "pointer", boxShadow: "0 4px 8px rgba(0,0,0,0.2)", borderRadius: "8px", transition: "transform 0.2s"
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
                     onClick={() => handleBoardSelect(board)}>
                     <h4>Board {boardIndex + 1}</h4>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(5,40px)", gap: "5px" }}>
-                      
+
                       {toColumnViseBoard(board).map((num, numIndex) => (
-                        <div key={numIndex} style={{ textAlign: "center", border: "1px solid #000", padding: "5px" }}>
+                        <div key={numIndex} 
+                          style={{ 
+                            textAlign: "center", border: "1px solid #000", padding: "5px" ,border: "1px solid #000", borderRadius: "6px"
+                          }}>
                           {num}
                         </div>
                       ))}
