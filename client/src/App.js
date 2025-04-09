@@ -78,6 +78,10 @@ function App() {
       setSelectedNumbers((prev) =>
         prev.includes(number) ? prev : [...prev, number]
       )
+    }else if (!selectedNumbers.includes(number)){
+      // setScore((prev) => prev-10);
+      socket.emit('wrong-click');
+      
     }
   }
 

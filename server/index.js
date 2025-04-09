@@ -89,9 +89,12 @@ io.on('connection', async (socket) => {
     //     socket.emit("number-called", { number: randomNumber, time: now })
     // }, process.env.INTERVAL_TIME);
 
-    socket.on('click-number', ({ number, createdAt, Bingo=false }) => {
+    socket.on('click-number', async ({ number, createdAt, Bingo=false }) => {
         
         let points = 0;
+        const player = await Player.findOne({socketId: socket.id});
+        if(!player) return;
+
         if(Bingo){
             points = 1000;
             socket.emit('game-over', { message: 'Game Over!' });
@@ -103,16 +106,34 @@ io.on('connection', async (socket) => {
         }
         
         // console.log(points, number)
-        socket.data.score += points;
-        socket.emit("score-update", socket.data.score);
+        // console.log(player.score)
+        player.score += points;
+        await player.save();
+        // console.log(player.score)
+        socket.emit("score-update", player.score);
 
 
-        Player.findOneAndUpdate(
-            { socketId: socket.id },
-            { $set: { score: socket.data.score } },
-            { upsert: true }
-        ).exec()
+        // Player.findOneAndUpdate(
+        //     { socketId: socket.id },
+        //     { $set: { score: socket.data.score } },
+        //     { upsert: true }
+        // ).exec()
 
+    })
+
+    socket.on('wrong-click',async () => {
+        try{
+            const player = await Player.findOne({socketId: socket.id});
+            if(!player) return;
+
+            player.score = player.score - 10;
+            await player.save();
+
+            io.to(socket.id).emit('score-update', player.score);
+        }catch(err){
+            console.error('Error updating score on wronng click:', err);
+        }
+         
     })
 
     socket.on("disconnect", () => {
