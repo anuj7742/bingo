@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import {ToastContainer, toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import socket from './socket';
 
@@ -17,7 +19,7 @@ function App() {
   const [bingoClaimed, setBingoClaimed] = useState(false);
 
   const [showRules, setShowRules] = useState(false);
-
+  const [wrongClickedForCurrNumber, setWrongClickedForCurrNumber] = useState()
   const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
@@ -47,6 +49,7 @@ function App() {
     socket.on('number-called', ({ number, time }) => {
       setCalledNumber(number);
       setCalledTime(time);
+      setWrongClickedForCurrNumber(false);
     })
 
     socket.on('score-update', (newScore) => {
@@ -74,22 +77,36 @@ function App() {
   }
 
   const handleNumberClick = (number) => {
-    if (number === calledNumber && !selectedNumbers.includes(number)) {
-      socket.emit('click-number', { number, createdAt: calledTime })
+    if (!calledNumber || selectedNumbers.includes(number) || gameOver) return;
 
-      setSelectedNumbers((prev) =>
-        prev.includes(number) ? prev : [...prev, number]
-      )
-    } else if (!selectedNumbers.includes(number)) {
-      // setScore((prev) => prev-10);
-      socket.emit('wrong-click');
+    if (number === calledNumber) {
+      if (!selectedNumbers.includes(number)) {
+        socket.emit('click-number', { number, createdAt: calledTime })
 
+        setSelectedNumbers((prev) =>
+          prev.includes(number) ? prev : [...prev, number]
+        )
+      }
+    }
+    else {
+      if (!wrongClickedForCurrNumber && !selectedNumbers.includes(calledNumber)) {
+        setWrongClickedForCurrNumber(true);
+        toast.error("Wrong number! 10 points deducted.", {
+          position: "top-center",
+          autoClose:2000
+        })
+        socket.emit('wrong-click');
+
+      }
     }
   }
 
   const checkBingo = () => {
     if (bingoClaimed) {
-      alert("You have already claimed bingo.");
+      toast.info("You have already claimed Bingo!", {
+        position: "top-center",
+        autoClose:2000
+      });
       return;
     }
     const isBingo = () => {
@@ -116,32 +133,22 @@ function App() {
     }
 
     if (isBingo()) {
-      alert("🎉 BINGO! You Won!");
+      toast.success("🎉 BINGO! You did it!" , {
+        position: "top-center",
+        autoClose:2000
+      })
       setBingoClaimed(true);
       socket.off('number-called')
       setGameOver(true)
       socket.emit('click-number', { number: 0, createdAt: null, Bingo: true });
     } else {
-      alert("Not yet, Keep trying");
+      toast.warn("Not yet, Keep trying!" , {
+        position: "top-center",
+        autoClose:2000
+      });
     }
   }
 
-
-  // useEffect(() => {
-  //   console.log(boards)
-  // }, [boards])
-
-  // useEffect(() => {
-  //   console.log(selectedBoard)
-  // }, [selectedBoard])
-
-  // useEffect(() => {
-  //   console.log(score)
-  // }, [score])
-
-  // useEffect(()=>{
-  //   console.log(selectedNumbers);
-  // },[selectedNumbers])
 
   const toColumnViseBoard = (board) => {
     const columns = [[], [], [], [], []];
@@ -158,7 +165,7 @@ function App() {
       <h1>Bingo Game</h1>
       <button
         style={{
-          position:'fixed', left:10,top:10,
+          position: 'fixed', left: 10, top: 10,
           padding: "10px 20px",
           fontSize: "10px",
           backgroundColor: "#ed1313",
@@ -329,6 +336,7 @@ function App() {
           </div>
         )
       }
+      <ToastContainer/>
     </div>
   );
 }
