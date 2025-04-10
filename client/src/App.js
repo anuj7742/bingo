@@ -43,7 +43,6 @@ function App() {
   useEffect(() => {
     socket.on('choose-boards', (data) => {
       setBoards(data);
-      // console.log(data);
     })
 
     socket.on('number-called', ({ number, time }) => {
@@ -53,7 +52,7 @@ function App() {
     })
 
     socket.on('score-update', (newScore) => {
-      // console.log(newScore)
+      
       setScore(newScore);
     })
 
@@ -138,14 +137,21 @@ function App() {
         autoClose:2000
       })
       setBingoClaimed(true);
-      socket.off('number-called')
       setGameOver(true)
       socket.emit('click-number', { number: 0, createdAt: null, Bingo: true });
     } else {
-      toast.warn("Not yet, Keep trying!" , {
-        position: "top-center",
-        autoClose:2000
-      });
+      if(!gameOver){
+        toast.warn("Not yet, Keep trying!" , {
+          position: "top-center",
+          autoClose:2000
+        });
+      }else{
+        toast.warn("Not a Bingo, Start new game." , {
+          position: "top-center",
+          autoClose:2000
+        });
+      }
+      
     }
   }
 
